@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GiFlowerEmblem } from 'react-icons/gi';
 
 const cardImages = [
@@ -59,14 +59,17 @@ const Game = () => {
   const bgMusic = useRef(null);
   const alertSound = useRef(null);
 
-  const startAudio = () => {
+  const startAudio = useCallback(() => {
     if (bgMusic.current) {
       bgMusic.current.volume = volume;
       bgMusic.current.play()
         .then(() => setAudioStarted(true))
-        .catch(error => console.log('Audio playback failed:', error));
+        .catch(error => {
+          console.log('Audio playback failed:', error);
+          setAudioStarted(false);
+        });
     }
-  };
+  }, [volume]);
 
   const handleVolumeChange = (e) => {
     const newVolume = parseFloat(e.target.value);
@@ -88,20 +91,26 @@ const Game = () => {
     setIsWin(false);
     firstCard.current = null;
     secondCard.current = null;
+    
+    // Restart background music
+    if (bgMusic.current) {
+      bgMusic.current.currentTime = 0;
+      bgMusic.current.play()
+        .then(() => setAudioStarted(true))
+        .catch(error => {
+          console.log('Audio playback failed:', error);
+          setAudioStarted(false);
+        });
+    }
   };
 
   const handleCardClick = (card) => {
-    if (disabled || card.matched) return;
-
-    if (card.flipped) {
-      setCards(prev => prev.map(c => c.id === card.id ? { ...c, flipped: false } : c));
-      return;
-    }
+    if (disabled || card.matched || card.flipped) return;
 
     if (!firstCard.current) {
       firstCard.current = card;
       setCards(prev => prev.map(c => c.id === card.id ? { ...c, flipped: true } : c));
-    } else {
+    } else if (!secondCard.current) {
       secondCard.current = card;
       setCards(prev => prev.map(c => c.id === card.id ? { ...c, flipped: true } : c));
       setDisabled(true);
@@ -118,9 +127,16 @@ const Game = () => {
         }, 500);
       } else {
         setScore(prev => Math.max(0, prev - 10));
-        firstCard.current = null;
-        secondCard.current = null;
-        setDisabled(false);
+        const firstCardId = firstCard.current.id;
+        const secondCardId = card.id;
+        setTimeout(() => {
+          setCards(prev => prev.map(c => 
+            c.id === firstCardId || c.id === secondCardId ? { ...c, flipped: false } : c
+          ));
+          firstCard.current = null;
+          secondCard.current = null;
+          setDisabled(false);
+        }, 1000);
       }
 
       setTurns(prev => prev + 1);
@@ -129,20 +145,40 @@ const Game = () => {
 
   useEffect(() => {
     shuffleCards();
-    document.addEventListener('click', startAudio, { once: true });
-    return () => document.removeEventListener('click', startAudio);
-  }, []);
+    const handleFirstClick = () => {
+      startAudio();
+      document.removeEventListener('click', handleFirstClick);
+    };
+    document.addEventListener('click', handleFirstClick);
+    
+    // Store the current ref value
+    const currentBgMusic = bgMusic.current;
+    
+    return () => {
+      document.removeEventListener('click', handleFirstClick);
+      if (currentBgMusic) {
+        currentBgMusic.pause();
+        currentBgMusic.currentTime = 0;
+      }
+    };
+  }, [startAudio]);
 
   useEffect(() => {
     if (cards.length > 0 && cards.every(card => card.matched)) {
       setIsWin(true);
       setGameOver(true);
-      bgMusic.current?.pause();
+      if (bgMusic.current) {
+        bgMusic.current.pause();
+      }
     } else if (turns >= 30) {
       setIsWin(false);
       setGameOver(true);
-      alertSound.current?.play();
-      bgMusic.current?.pause();
+      if (alertSound.current) {
+        alertSound.current.play().catch(error => console.log('Alert sound failed:', error));
+      }
+      if (bgMusic.current) {
+        bgMusic.current.pause();
+      }
     }
   }, [turns, cards]);
 
@@ -195,11 +231,12 @@ const Game = () => {
               <div className="card-front">
                 <img 
                   src={card.image} 
-                  alt={card.name.replace('_', ' ')}
+                  alt={`${card.name.replace(/_/g, ' ')} card`}
                   onError={(e) => {
                     console.error(`Failed to load image: ${card.image}`);
                     e.target.onerror = null;
                     e.target.src = '/images/placeholder.png';
+                    e.target.alt = 'Placeholder card';
                   }}
                 />
               </div>
@@ -223,6 +260,7 @@ const Game = () => {
           </button>
         </div>
       )}
+      <div className="creator-credit">Created by Sanuda</div>
     </div>
   );
 };

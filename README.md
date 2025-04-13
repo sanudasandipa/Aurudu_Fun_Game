@@ -1,3 +1,55 @@
+# New Year Memory Game
+
+A fun and interactive memory card game created by Sanuda to celebrate the New Year! Match pairs of cards featuring traditional New Year symbols and items.
+
+## Features
+
+- Interactive card flipping game
+- Beautiful traditional New Year themed cards
+- Background music and sound effects
+- Score tracking system
+- Responsive design for all devices
+- Volume control for background music
+
+## How to Play
+
+1. Click on cards to flip them
+2. Find matching pairs of cards
+3. Match all cards to win
+4. Try to complete the game within 30 turns
+
+## Technologies Used
+
+- React.js
+- CSS3
+- HTML5
+- JavaScript
+
+## Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/sanudasandipa/Aurudu_Fun_Game.git
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Start the development server
+```bash
+npm start
+```
+
+## Credits
+
+Created by [Sanuda](https://github.com/sanudasandipa)
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
