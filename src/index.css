@@ -270,3 +270,44 @@ body {
     width: 80px;
   }
 }
+
+.instructions-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.instructions-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.instructions-text {
+  text-align: left;
+  margin: 1rem 0;
+}
+
+.instructions-text ol {
+  padding-left: 1.5rem;
+}
+
+.instructions-text li {
+  margin: 0.5rem 0;
+}
+
+.instructions-text p {
+  margin: 0.5rem 0;
+}

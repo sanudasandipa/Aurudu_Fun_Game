@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GiFlowerEmblem } from 'react-icons/gi';
+import { FaQuestionCircle } from 'react-icons/fa';
 
 const cardImages = [
     { 
@@ -53,6 +54,7 @@ const Game = () => {
   const [audioStarted, setAudioStarted] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [showInstructions, setShowInstructions] = useState(false);
   
   const firstCard = useRef(null);
   const secondCard = useRef(null);
@@ -190,6 +192,42 @@ const Game = () => {
       <audio ref={alertSound}>
         <source src="/sounds/firecracker_alert.mp3" type="audio/mpeg" />
       </audio>
+
+      <button 
+        className="btn btn-info position-fixed top-0 end-0 m-3"
+        onClick={() => setShowInstructions(true)}
+        style={{ zIndex: 1000 }}
+      >
+        <FaQuestionCircle /> How to Play
+      </button>
+
+      {showInstructions && (
+        <div className="instructions-overlay">
+          <div className="instructions-content">
+            <h3>How to Play</h3>
+            <div className="instructions-text">
+              <p>🎮 Welcome to the New Year Memory Game! 🎮</p>
+              <ol>
+                <li>Click on cards to flip them and find matching pairs</li>
+                <li>You can only flip two cards at a time</li>
+                <li>If the cards match, they  flipped and dissapear and add points to your score</li>
+                <li>If they don't match, they flip back</li>
+                <li>Try to find all pairs within 30 turns</li>
+                <li>Matching pairs give you 50 points</li>
+                <li>Non-matching pairs cost you 10 points</li>
+              </ol>
+              <p>🎵 You can control the background music volume</p>
+              <p>🎉 Good luck and have fun! 🎉</p>
+            </div>
+            <button 
+              className="btn btn-primary mt-3"
+              onClick={() => setShowInstructions(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {!audioStarted ? (
         <div className="alert alert-warning mt-3">
